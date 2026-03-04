@@ -1,0 +1,123 @@
+TYPE Snake
+  FIELD:
+    0. pieceSize : int
+    1. nPieces   : int
+    2. pieces    : Array
+
+  CONSTRUCTOR new(in_pieceSize, in_nPieces) -> Snake
+    locals:
+      0. i    : int
+      1. posX : int
+      2. posY : int
+
+    pieceSize = in_pieceSize
+    nPieces   = in_nPieces
+    pieces    = Array.new(100)
+
+    posX = 0
+    posY = 0
+
+    i = 0
+    while (i < nPieces) 
+    {
+      pieces[i] = Piece.new(pieceSize, posX, posY)
+      posX = posX + pieceSize
+      i = i + 1
+    }
+
+    return this
+
+
+  METHOD draw() -> void
+    locals:
+      0. i     : int
+      1. piece : Piece
+
+    i = 0
+    while (i < nPieces) 
+    {
+      piece = pieces[i]
+      piece.draw()
+      i = i + 1
+    }
+
+    return
+
+
+  METHOD erase() -> void
+    loclas:
+      0. i     : int
+      1. piece : Piece
+
+    i = 0
+    while (i < nPieces) 
+    {
+      piece = pieces[i]
+      piece.erase()
+      i = i + 1
+    }
+
+    return
+
+
+  METHOD move(direction) -> boolean
+    locals:
+      0. i            : int
+      1. piece        : Piece
+      2. nextPiece    : Piece
+      3. head         : Piece
+
+    if (direction == 0) 
+    {
+      return true
+    }
+
+    // shift del corpo: ogni pezzo prende le coordinate del pezzo successivo
+    i = 0
+    while (i < (nPieces - 1)) 
+    {
+      piece     = pieces[i]
+      nextPiece = pieces[i + 1]
+
+      piece.setX( nextPiece.getX() )
+      piece.setY( nextPiece.getY() )
+
+      i = i + 1
+    }
+
+    // testa = ultimo pezzo
+    head = pieces[nPieces - 1]
+
+    // right
+    if (direction == 1) 
+    {
+      if (head.getX() + pieceSize + pieceSize > 511) { return false }
+      head.setX(head.getX() + pieceSize)
+      return true
+    }
+
+    // left
+    if (direction == 2) 
+    {
+      if (head.getX() - pieceSize < 0) { return false }
+      head.setX(head.getX() - pieceSize)
+      return true
+    }
+
+    // up
+    if (direction == 3) 
+    {
+      if (head.getY() - pieceSize < 0) { return false }
+      head.setY(head.getY() - pieceSize)
+      return true
+    }
+
+    // down
+    if (direction == 4) 
+    {
+      if (head.getY() + pieceSize + pieceSize > 255) { return false }
+      head.setY(head.getY() + pieceSize)
+      return true
+    }
+
+    return true

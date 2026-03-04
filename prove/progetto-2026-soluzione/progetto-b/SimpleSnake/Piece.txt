@@ -1,0 +1,35 @@
+TYPE: Piece
+  FIELD:
+    0. x : int
+    1. y : int
+    2. size : int
+
+  CONSTRUCTOR new(in_size, in_x, in_y) -> Piece
+    size = in_size
+    x    = in_x
+    y    = in_y
+    return this
+
+  METHOD getX() -> int
+    return x
+
+  METHOD getY() -> int
+    return y
+
+  METHOD setX(new_x) -> void
+    x = new_x
+    return
+
+  METHOD setY(new_y) -> void
+    y = new_y
+    return
+
+  METHOD draw() -> void
+    Screen.setColor(true)
+    Screen.drawRectangle(x, y, x + size, y + size)
+    return
+
+  METHOD erase() -> void
+    Screen.setColor(false)
+    Screen.drawRectangle(x, y, x + size, y + size)
+    return

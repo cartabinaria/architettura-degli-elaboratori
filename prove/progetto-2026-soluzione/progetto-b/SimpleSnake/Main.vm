@@ -1,0 +1,8 @@
+function Main.main 1       // funzione main, 1 local (l'istanza del gioco) 
+  call SnakeGame.new 0     // crea una istanza di gioco
+  pop local 0              // mette l'oggetto ritornato in local 0
+  push local 0             // rimette l'oggetto in stack per chiamare la funzione run
+  call SnakeGame.run 1     // chiama la funzione run, che fa partire il loop principale
+  pop temp 0               // svuota il valore ritornato (inutile)
+  push constant 0          // valore dummy
+  return                   // return 0

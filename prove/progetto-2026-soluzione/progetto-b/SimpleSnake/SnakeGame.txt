@@ -1,0 +1,45 @@
+TYPE: SnakeGame
+  FIELD:
+    0. snake     : Snake
+    1. direction : int
+    2. pieceSize : int
+    3. nPieces   : int
+
+  CONSTRUCTOR new() -> SnakeGame
+    pieceSize = 15
+    nPieces   = 10
+    direction = 1
+    snake     = Snake.new(pieceSize, nPieces)
+    return this
+
+  METHOD run() -> void
+    locals:
+      0. key  : char
+      1. exit : boolean
+
+    exit = false
+    key  = 0
+
+    while (NOT exit) 
+    { 
+      key = Keyboard.keyPressed()
+
+      if (key == 113 OR key == 82)          then exit = true      // tasto q (o Q)
+      if (key == 132 AND direction != 2)    then direction = 1    // destra
+      if (key == 130 AND direction != 1)    then direction = 2    // sinistra
+      if (key == 131 AND direction != 4)    then direction = 3    // su
+      if (key == 133 AND direction != 3)    then direction = 4    // giù
+
+      snake.erase()
+
+      if (NOT snake.move(direction)) 
+      {
+        exit = true
+      }
+
+      snake.draw()
+
+      Sys.wait(50)
+    }
+
+    return

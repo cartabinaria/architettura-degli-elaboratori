@@ -1,0 +1,44 @@
+function Main.main 0                 
+  push constant 12                   // lunghezza della stringa (12 caratteri)
+  call String.new 1                  // crea un oggetto String vuoto con capacità 12; ritorna il riferimento
+
+  push constant 72                   // 'H'
+  call String.appendChar 2           // aggiunge 'H' alla stringa (usa: stringRef + char)
+
+  push constant 101                  // 'e'
+  call String.appendChar 2           // aggiunge 'e'
+
+  push constant 108                  // 'l'
+  call String.appendChar 2           
+
+  push constant 108                  // 'l'
+  call String.appendChar 2           
+
+  push constant 111                  // 'o'
+  call String.appendChar 2           
+
+  push constant 32                   // ' ' (spazio)
+  call String.appendChar 2         
+
+  push constant 87                   // 'W'
+  call String.appendChar 2        
+
+  push constant 111                  // 'o'
+  call String.appendChar 2          
+
+  push constant 114                  // 'r'
+  call String.appendChar 2          
+
+  push constant 108                  // 'l'
+  call String.appendChar 2     
+
+  push constant 100                  // 'd'
+  call String.appendChar 2    
+
+  push constant 33                   // '!'
+  call String.appendChar 2        
+
+  call Output.printString 1          // stampa la stringa costruita
+
+  return                             // come valore di ritorno usa lo stesso di Output.printString
+                                     // essendo entrambi valori dummy per funzioni void
