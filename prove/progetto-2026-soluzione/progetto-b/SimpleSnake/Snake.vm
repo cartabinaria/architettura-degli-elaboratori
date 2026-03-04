@@ -1,0 +1,333 @@
+function Snake.new 3                 // costruttore Snake.new; 3 locali: i, posX, posY
+  push constant 3                    // numero di campi dell’oggetto Snake (pieceSize, nPieces, pieces)
+  call Memory.alloc 1                // alloca memoria per 3 campi; ritorna base address dell’oggetto
+  pop pointer 0                      // THIS = base address dell’oggetto (this)
+  push argument 0                    // push in_pieceSize
+  pop this 0                         // this.pieceSize = in_pieceSize
+  push argument 1                    // push in_nPieces
+  pop this 1                         // this.nPieces = in_nPieces
+  push constant 100                  // push 100 (dimensione massima array pieces)
+  call Array.new 1                   // alloca un Array di lunghezza 100; ritorna base address dell’array
+  pop this 2                         // this.pieces = array appena creato
+  push constant 0                    // push 0
+  pop local 1                        // local1 (posX) = 0
+  push constant 0                    // push 0
+  pop local 2                        // local2 (posY) = 0
+  push constant 0                    // push 0
+  pop local 0                        // local0 (i) = 0
+
+  label WHILE_START0                 // inizio condizione while (i < nPieces)
+    push local 0                     // push i
+    push this 1                      // push nPieces
+    lt                               // i < nPieces ?
+    not                              // nega: true se i >= nPieces
+    if-goto WHILE_END0               // se i >= nPieces esci dal while
+
+    push local 0                     // push i (indice)
+    push this 2                      // push base address di pieces (Array)
+    add                              // calcola indirizzo pieces + i (slot dell’array)
+    push this 0                      // push pieceSize (arg0 per Piece.new)
+    push local 1                     // push posX (arg1 per Piece.new)
+    push local 2                     // push posY (arg2 per Piece.new)
+    call Piece.new 3                 // crea un nuovo Piece(pieceSize,posX,posY); ritorna il riferimento all’oggetto
+    pop temp 0                       // salva il riferimento del Piece in temp0 (temporaneo)
+    pop pointer 1                    // THAT = (pieces + i) (indirizzo dello slot nell’array)  [pointer 1 = THAT]
+    push temp 0                      // ripush del riferimento al Piece creato
+    pop that 0                       // *THAT = pieceRef  => pieces[i] = piece
+
+    push local 1                     // push posX
+    push this 0                      // push pieceSize
+    add                              // posX + pieceSize
+    pop local 1                      // posX = posX + pieceSize
+
+    push local 0                     // push i
+    push constant 1                  // push 1
+    add                              // i + 1
+    pop local 0                      // i = i + 1
+
+    goto WHILE_START0                // ripeti while
+  label WHILE_END0                   // fine while
+
+  push pointer 0                     // push this (riferimento all’oggetto Snake)
+  return                             // ritorna this
+
+function Snake.draw 2                // metodo draw; 2 locali: i, piece
+  push argument 0                    // push this (arg0)
+  pop pointer 0                      // THIS = arg0 (set contesto oggetto)
+  push constant 0                    // push 0
+  pop local 0                        // i = 0
+
+  label WHILE_START0                 // while (i < nPieces)
+    push local 0                     // push i
+    push this 1                      // push nPieces
+    lt                               // i < nPieces ?
+    not                              // true se i >= nPieces
+    if-goto WHILE_END0               // se finito, esci
+
+    push local 0                     // push i
+    push this 2                      // push pieces (base address array)
+    add                              // calcola address pieces+i (slot)
+    pop pointer 1                    // THAT = address slot pieces[i]
+    push that 0                      // push pieces[i] (riferimento al Piece)
+    pop local 1                      // local1 (piece) = pieces[i]
+
+    push local 1                     // push piece (this per chiamata metodo)
+    call Piece.draw 1                // chiama piece.draw(); ritorna dummy
+    pop temp 0                       // scarta ritorno dummy
+
+    push local 0                     // push i
+    push constant 1                  // push 1
+    add                              // i+1
+    pop local 0                      // i = i + 1
+
+    goto WHILE_START0                // continua loop
+  label WHILE_END0                   // fine while
+
+  push constant 0                    // push 0 (dummy return per void)
+  return                             // return
+
+function Snake.erase 2               // metodo erase; 2 locali: i, piece
+  push argument 0                    // push this (arg0)
+  pop pointer 0                      // THIS = arg0
+  push constant 0                    // push 0
+  pop local 0                        // i = 0
+
+  label WHILE_START0                 // while (i < nPieces)
+    push local 0                     // push i
+    push this 1                      // push nPieces
+    lt                               // i < nPieces ?
+    not                              // true se i >= nPieces
+    if-goto WHILE_END0               // se finito, esci
+
+    push local 0                     // push i
+    push this 2                      // push pieces
+    add                              // address pieces+i (slot)
+    pop pointer 1                    // THAT = address slot
+    push that 0                      // push pieces[i] (piece ref)
+    pop local 1                      // piece = pieces[i]
+
+    push local 1                     // push piece
+    call Piece.erase 1               // chiama piece.erase(); ritorna dummy
+    pop temp 0                       // scarta dummy
+
+    push local 0                     // push i
+    push constant 1                  // push 1
+    add                              // i+1
+    pop local 0                      // i = i + 1
+
+    goto WHILE_START0                // continua loop
+  label WHILE_END0                   // fine while
+
+  push constant 0                    // push 0 (dummy return per void)
+  return                             // return
+
+function Snake.move 4                // metodo move; 5 locali: i, piece, nextPiece, head
+  push argument 0                    // push this (arg0)
+  pop pointer 0                      // THIS = arg0
+  push argument 1                    // push direction
+  push constant 0                    // push 0
+  eq                                 // direction == 0 ?
+  if-goto IF_TRUE0                   // se sì, vai al ramo true
+  goto IF_FALSE0                     // altrimenti ramo false
+
+  label IF_TRUE0                     // if (direction == 0)
+    push constant 0                  // push 0
+    not                              // NOT 0 => -1 (true)
+    return                           // return true
+
+  label IF_FALSE0                    // else: direction != 0
+    push constant 0                  // push 0
+    pop local 0                      // i = 0
+
+    label WHILE_START0               // while (i < (nPieces - 1))
+      push local 0                   // push i
+      push this 1                    // push nPieces
+      push constant 1                // push 1
+      sub                            // nPieces - 1
+      lt                             // i < (nPieces - 1) ?
+      not                            // true se i >= nPieces-1
+      if-goto WHILE_END0             // esci se finito
+
+      push local 0                   // push i
+      push this 2                    // push pieces
+      add                            // address slot pieces[i]
+      pop pointer 1                  // THAT = slot
+      push that 0                    // push pieces[i]
+      pop local 1                    // piece = pieces[i]
+
+      push local 0                   // push i
+      push constant 1                // push 1
+      add                            // i+1
+      push this 2                    // push pieces
+      add                            // address slot pieces[i+1]
+      pop pointer 1                  // THAT = slot
+      push that 0                    // push pieces[i+1]
+      pop local 2                    // nextPiece = pieces[i+1]
+
+      push local 1                   // push piece (this per setX)
+      push local 2                   // push nextPiece (this per getX)
+      call Piece.getX 1              // nextPiece.getX() -> lascia X sullo stack
+      call Piece.setX 2              // piece.setX( X )  -> consuma (this, arg) e ritorna dummy
+      pop temp 0                     // scarta dummy
+
+      push local 1                   // push piece (this per setY)
+      push local 2                   // push nextPiece (this per getY)
+      call Piece.getY 1              // nextPiece.getY() -> lascia Y sullo stack
+      call Piece.setY 2              // piece.setY( Y )  -> ritorna dummy
+      pop temp 0                     // scarta dummy
+
+      push local 0                   // push i
+      push constant 1                // push 1
+      add                            // i+1
+      pop local 0                    // i = i + 1
+      goto WHILE_START0              // ripeti loop
+    label WHILE_END0                 // fine while (body shift completato)
+
+    push this 1                      // push nPieces
+    push constant 1                  // push 1
+    sub                              // nPieces - 1 (indice della testa)
+    push this 2                      // push pieces
+    add                              // address slot pieces[nPieces-1]
+    pop pointer 1                    // THAT = slot
+    push that 0                      // push pieces[nPieces-1]
+    pop local 3                      // head = pieces[nPieces-1]
+
+    push argument 1                  // push direction
+    push constant 1                  // push 1
+    eq                               // direction == 1 ?
+    if-goto IF_TRUE1                 // ramo right
+    goto IF_FALSE1                   // altrimenti continua
+
+    label IF_TRUE1                   // if (direction == 1)  // right
+      push local 3                   // push head
+      call Piece.getX 1              // head.getX()
+      push this 0                    // push pieceSize
+      add                            // head.getX() + pieceSize
+      push this 0                    // push pieceSize
+      add                            // head.getX() + pieceSize + pieceSize
+      push constant 511              // push 511 (limite destro schermo)
+      gt                             // (x + 2*pieceSize) > 511 ?
+      if-goto IF_TRUE2               // se fuori, return false
+      goto IF_FALSE2                 // altrimenti ok
+
+      label IF_TRUE2                 // fuori bordo a destra
+        push constant 0              // push 0 (false)
+        return                       // return false
+
+      label IF_FALSE2                // dentro bordo: aggiorna X
+        push local 3                 // push head (this per setX)
+        push local 3                 // push head (this per getX)
+        call Piece.getX 1            // head.getX()
+        push this 0                  // push pieceSize
+        add                          // head.getX() + pieceSize
+        call Piece.setX 2            // head.setX(head.getX()+pieceSize)
+        pop temp 0                   // scarta dummy
+        push constant 0              // push 0
+        not                          // true
+        return                       // return true
+
+    label IF_FALSE1                  // else: direction != 1
+      push argument 1                // push direction
+      push constant 2                // push 2
+      eq                             // direction == 2 ?
+      if-goto IF_TRUE3               // ramo left
+      goto IF_FALSE3                 // altrimenti continua
+
+    label IF_TRUE3                   // if (direction == 2)  // left
+      push local 3                   // push head
+      call Piece.getX 1              // head.getX()
+      push this 0                    // push pieceSize
+      sub                            // head.getX() - pieceSize
+      push constant 0                // push 0
+      lt                             // (x - pieceSize) < 0 ?
+      if-goto IF_TRUE4               // se sì, fuori => false
+      goto IF_FALSE4                 // altrimenti ok
+
+      label IF_TRUE4                 // fuori bordo a sinistra
+        push constant 0              // false
+        return                       // return false
+
+      label IF_FALSE4                // dentro bordo: aggiorna X
+        push local 3                 // push head (this per setX)
+        push local 3                 // push head (this per getX)
+        call Piece.getX 1            // head.getX()
+        push this 0                  // push pieceSize
+        sub                          // head.getX() - pieceSize
+        call Piece.setX 2            // head.setX(head.getX()-pieceSize)
+        pop temp 0                   // scarta dummy
+        push constant 0              // push 0
+        not                          // true
+        return                       // return true
+
+    label IF_FALSE3                  // else: direction != 2
+      push argument 1                // push direction
+      push constant 3                // push 3
+      eq                             // direction == 3 ?
+      if-goto IF_TRUE5               // ramo up
+      goto IF_FALSE5                 // altrimenti continua
+
+    label IF_TRUE5                   // if (direction == 3)  // up
+      push local 3                   // push head
+      call Piece.getY 1              // head.getY()
+      push this 0                    // push pieceSize
+      sub                            // head.getY() - pieceSize
+      push constant 0                // push 0
+      lt                             // (y - pieceSize) < 0 ?
+      if-goto IF_TRUE6               // se fuori => false
+      goto IF_FALSE6                 // altrimenti ok
+
+      label IF_TRUE6                 // fuori bordo in alto
+        push constant 0              // false
+        return                       // return false
+
+      label IF_FALSE6                // dentro bordo: aggiorna Y
+        push local 3                 // push head (this per setY)
+        push local 3                 // push head (this per getY)
+        call Piece.getY 1            // head.getY()
+        push this 0                  // push pieceSize
+        sub                          // head.getY() - pieceSize
+        call Piece.setY 2            // head.setY(head.getY()-pieceSize)
+        pop temp 0                   // scarta dummy
+        push constant 0              // push 0
+        not                          // true
+        return                       // return true
+
+    label IF_FALSE5                  // else: direction != 3
+      push argument 1                // push direction
+      push constant 4                // push 4
+      eq                             // direction == 4 ?
+      if-goto IF_TRUE7               // ramo down
+      goto IF_FALSE7                 // altrimenti default
+
+    label IF_TRUE7                   // if (direction == 4)  // down
+      push local 3                   // push head
+      call Piece.getY 1              // head.getY()
+      push this 0                    // push pieceSize
+      add                            // head.getY() + pieceSize
+      push this 0                    // push pieceSize
+      add                            // head.getY() + pieceSize + pieceSize
+      push constant 255              // push 255 (limite basso schermo)
+      gt                             // (y + 2*pieceSize) > 255 ?
+      if-goto IF_TRUE8               // se fuori => false
+      goto IF_FALSE8                 // altrimenti ok
+
+      label IF_TRUE8                 // fuori bordo in basso
+        push constant 0              // false
+        return                       // return false
+
+      label IF_FALSE8                // dentro bordo: aggiorna Y
+        push local 3                 // push head (this per setY)
+        push local 3                 // push head (this per getY)
+        call Piece.getY 1            // head.getY()
+        push this 0                  // push pieceSize
+        add                          // head.getY() + pieceSize
+        call Piece.setY 2            // head.setY(head.getY()+pieceSize)
+        pop temp 0                   // scarta dummy
+        push constant 0              // push 0
+        not                          // true
+        return                       // return true
+
+    label IF_FALSE7                  // else: direction non è 1,2,3,4 (o caso default)
+      push constant 0                // push 0
+      not                            // true
+      return                         // return true

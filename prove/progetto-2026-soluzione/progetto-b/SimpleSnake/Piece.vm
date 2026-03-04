@@ -1,0 +1,79 @@
+function Piece.new 0            // definisce il costruttore Piece.new; 0 variabili locali
+  push constant 3               // mette 3 sullo stack (numero di campi da allocare: x,y,size)
+  call Memory.alloc 1           // chiama Memory.alloc con 1 argomento (3); ritorna base address dell’oggetto
+  pop pointer 0                 // THIS = base address dell’oggetto appena allocato (pointer 0 è THIS)
+  push argument 0               // push di in_size (arg0) sullo stack
+  pop this 2                    // this[2] = size = in_size
+  push argument 1               // push di in_x (arg1) sullo stack
+  pop this 0                    // this[0] = x = in_x
+  push argument 2               // push di in_y (arg2) sullo stack
+  pop this 1                    // this[1] = y = in_y
+  push pointer 0                // push di THIS (base address dell’oggetto) come valore di ritorno
+  return                        // ritorna l’oggetto (this)
+
+function Piece.getX 0           // definisce il metodo getX; 0 variabili locali
+  push argument 0               // push dell’oggetto su cui è chiamato il metodo (this è arg0)
+  pop pointer 0                 // THIS = arg0 (imposta il contesto dell’oggetto)
+  push this 0                   // push del campo x (this[0]) sullo stack
+  return                        // ritorna x
+
+function Piece.getY 0           // definisce il metodo getY; 0 variabili locali
+  push argument 0               // push dell’oggetto (this) passato come arg0
+  pop pointer 0                 // THIS = arg0
+  push this 1                   // push del campo y (this[1]) sullo stack
+  return                        // ritorna y
+
+function Piece.setX 0           // definisce il metodo setX; 0 variabili locali
+  push argument 0               // push dell’oggetto (this) passato come arg0
+  pop pointer 0                 // THIS = arg0
+  push argument 1               // push di new_x (arg1) sullo stack
+  pop this 0                    // this[0] = x = new_x
+  push constant 0               // push di 0 (valore dummy per return void)
+  return                        // return
+
+function Piece.setY 0           // definisce il metodo setY; 0 variabili locali
+  push argument 0               // push dell’oggetto (this) passato come arg0
+  pop pointer 0                 // THIS = arg0
+  push argument 1               // push di new_y (arg1) sullo stack
+  pop this 1                    // this[1] = y = new_y
+  push constant 0               // push di 0 (dummy return per void)
+  return                        // return
+
+function Piece.draw 0           // definisce il metodo draw; 0 variabili locali
+  push argument 0               // push dell’oggetto (this) come arg0
+  pop pointer 0                 // THIS = arg0 (set contesto)
+  push constant 0               // push 0 sullo stack
+  not                           // NOT 0 => -1 (true); prepara l’argomento true
+  call Screen.setColor 1        // chiama Screen.setColor(true) con 1 argomento; ritorna un valore dummy
+  pop temp 0                    // scarta il valore di ritorno della call
+  push this 0                   // push x
+  push this 1                   // push y
+  push this 0                   // push x (serve per x+size)
+  push this 2                   // push size
+  add                           // calcola x + size (top2 -> somma)
+  push this 1                   // push y (serve per y+size)
+  push this 2                   // push size
+  add                           // calcola y + size
+  call Screen.drawRectangle 4   // chiama drawRectangle(x, y, x+size, y+size) con 4 argomenti
+  pop temp 0                    // scarta il valore di ritorno dummy della call
+  push constant 0               // push 0 (dummy return per void)
+  return                        // return
+
+function Piece.erase 0          // definisce il metodo erase; 0 variabili locali
+  push argument 0               // push dell’oggetto (this) come arg0
+  pop pointer 0                 // THIS = arg0
+  push constant 0               // push 0 (false)
+  call Screen.setColor 1        // chiama Screen.setColor(false)
+  pop temp 0                    // scarta il valore di ritorno dummy
+  push this 0                   // push x
+  push this 1                   // push y
+  push this 0                   // push x (per x+size)
+  push this 2                   // push size
+  add                           // calcola x + size
+  push this 1                   // push y (per y+size)
+  push this 2                   // push size
+  add                           // calcola y + size
+  call Screen.drawRectangle 4   // chiama drawRectangle(x, y, x+size, y+size) con 4 argomenti
+  pop temp 0                    // scarta il return dummy
+  push constant 0               // push 0 (dummy return per void)
+  return                        // return

@@ -1,0 +1,9 @@
+TYPE: Main
+
+  FUNCTION main() -> void
+    locals:
+      0. game : SnakeGame
+
+    game = SnakeGame.new()
+    game.run()
+    return
